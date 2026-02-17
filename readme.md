@@ -15,8 +15,6 @@ A robust Spring Boot REST API providing the backbone for the Habit Tracker appli
 - **Security:** Spring Security, JWT (JSON Web Tokens)
 - **Data:** Spring Data JPA, Hibernate, MySQL
 - **Build Tool:** Maven
-
----
 ---
 
 ## ▶️ Run the Project
@@ -37,6 +35,8 @@ Ensure **MySQL Server** is running. You must create the schema manually before t
 ```sql
 CREATE DATABASE habit_tracker;
 ```
+
+---
 ## 🏗 Architecture & Design
 
 ### Project Structure
@@ -97,3 +97,13 @@ The API implements **JWT (JSON Web Token)** for stateless, secure communication.
 | `DELETE` | `/api/admin/users/{id}` | Permanently delete a user account |
 
 ---
+
+
+## 👨‍💻 Author
+
+**Abdellah Chatioui** *Fullstack Developer*
+
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/abdellahchatioui)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abdellah-chatioui-5b9426299/)
+
+
