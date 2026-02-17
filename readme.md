@@ -29,12 +29,19 @@ git clone https://github.com/abdellahchatioui/Habit-Tracker-backend.git
 cd Habit-Tracker-backend
 
 ```
-
 ### 2. Database Setup
 Ensure **MySQL Server** is running. You must create the schema manually before the first run:
 ```sql
 CREATE DATABASE habit_tracker;
 ```
+---
+
+## 📡 Frontend Repository
+
+The Android application acts as a client and requires the companion REST API to be active for data persistence and authentication.
+### 🔗 Link to Frontend
+The server-side source code and setup instructions are available at:
+👉 **[Habit-Tracker-frontend](https://github.com/abdellahchatioui/Habit-Tracker-frontend.git)**
 
 ---
 ## 🏗 Architecture & Design
