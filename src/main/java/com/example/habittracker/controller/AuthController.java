@@ -3,6 +3,7 @@ package com.example.habittracker.controller;
 import com.example.habittracker.Entity.User;
 import com.example.habittracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -41,6 +42,25 @@ public class AuthController {
         return response;
     }
 
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User newUser) {
+
+        Optional<User> existingUser = userRepository.findByEmail(newUser.getEmail());
+
+        if (existingUser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "Email already exists"));
+        }
+
+        newUser.setRole("USER");
+        newUser.setEnabled(true);
+
+        userRepository.save(newUser);
+
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+    }
 
 
 }
