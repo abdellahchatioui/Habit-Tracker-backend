@@ -3,7 +3,10 @@ package com.example.habittracker.controller;
 import com.example.habittracker.Entity.*;
 import com.example.habittracker.repository.HabitRepository;
 import com.example.habittracker.repository.UserRepository;
+import com.example.habittracker.service.HabitService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +20,15 @@ public class HabitController {
 
     private final HabitRepository habitRepository;
     private final UserRepository userRepository;
+    private final HabitService habitService;
 
-    public HabitController(HabitRepository habitRepository, UserRepository userRepository) {
+    public HabitController(HabitRepository habitRepository, UserRepository userRepository, HabitService habitService) {
         this.habitRepository = habitRepository;
         this.userRepository = userRepository;
+        this.habitService = habitService;
     }
 
-    // GET all habits for authenticated user
+
     @GetMapping
     public List<Habit> getHabits() {
 
@@ -38,8 +43,20 @@ public class HabitController {
         return habitRepository.findByUser(user);
     }
 
-    // CREATE habit
-    @PostMapping
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateHabit(
+            @PathVariable Long id,
+            @RequestBody Habit updatedHabit,
+            Authentication authentication
+    ) {
+
+        Habit habit = habitService.updateHabit(id, updatedHabit, authentication.getName());
+
+        return ResponseEntity.ok(habit);
+    }
+
+    @PostMapping()
     public Habit createHabit(@RequestBody Habit habit) {
 
         String email = SecurityContextHolder.getContext()
@@ -54,7 +71,7 @@ public class HabitController {
         return habitRepository.save(habit);
     }
 
-    // DELETE habit
+
     @DeleteMapping("/{id}")
     public void deleteHabit(@PathVariable Long id) {
 
