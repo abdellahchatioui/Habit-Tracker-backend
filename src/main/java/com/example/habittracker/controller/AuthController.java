@@ -4,6 +4,7 @@ import com.example.habittracker.Entity.User;
 import com.example.habittracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -14,6 +15,9 @@ import java.util.Optional;
 @RequestMapping("api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public UserRepository userRepository;
@@ -54,6 +58,7 @@ public class AuthController {
                     .body(Map.of("error", "Email already exists"));
         }
 
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         newUser.setRole("USER");
         newUser.setEnabled(true);
 
