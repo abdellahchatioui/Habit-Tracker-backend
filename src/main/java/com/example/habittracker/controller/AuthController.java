@@ -1,9 +1,12 @@
 package com.example.habittracker.controller;
 
 import com.example.habittracker.Entity.User;
+import com.example.habittracker.dto.LoginRequest;
 import com.example.habittracker.repository.UserRepository;
+import com.example.habittracker.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,6 +19,12 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     public UserRepository userRepository;
 
 
@@ -25,23 +34,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String,String> login(@RequestBody User loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-        Optional<User> user = userRepository.findByEmailAndPassword(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        );
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Map<String,String> response = new HashMap<>();
-
-        if (user.isPresent()) {
-            response.put("token", "test-token-123");
-        } else {
-            response.put("error", "Invalid credentials");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "Invalid credentials"));
         }
-        return response;
-    }
 
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return ResponseEntity.ok(Map.of("token", token));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User newUser) {
@@ -54,6 +60,7 @@ public class AuthController {
                     .body(Map.of("error", "Email already exists"));
         }
 
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         newUser.setRole("USER");
         newUser.setEnabled(true);
 
