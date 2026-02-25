@@ -17,20 +17,23 @@ A robust Spring Boot REST API providing the backbone for the Habit Tracker appli
 - **Build Tool:** Maven
 ---
 
-## ▶️ Run the Project
-
-Follow these steps to set up and run the backend locally on your machine.
-
+## ▶ How to Run the Project
 ### 1. Clone the Repository
-Open your terminal and run the following command to clone the project:
 ```bash
 git clone https://github.com/abdellahchatioui/Habit-Tracker-backend.git
-
-cd Habit-Tracker-backend
-
+```
+```bash
+cd  Habit-Tracker-backend
+```
+```bash
+mvn spring-boot:run
+```
+Then open:
+```bash
+http://localhost:8080/api/auth
 ```
 ### 2. Database Setup
-Ensure **MySQL Server** is running. You must create the schema manually before the first run:
+Ensure **MySQL Server** is running *or use H2 database*. You must create the schema manually before the first run:
 ```sql
 CREATE DATABASE habit_tracker;
 ```
