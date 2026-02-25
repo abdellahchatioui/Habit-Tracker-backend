@@ -27,10 +27,9 @@ public class AuthController {
     @Autowired
     public UserRepository userRepository;
 
-
     @GetMapping
     public String test(){
-        return "good !!!";
+        return "server work !!!";
     }
 
     @PostMapping("/login")

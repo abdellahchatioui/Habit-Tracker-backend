@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -76,5 +77,34 @@ public class HabitController {
     public void deleteHabit(@PathVariable Long id) {
 
         habitRepository.deleteById(id);
+    }
+
+    @PostMapping("/{id}/log")
+    public ResponseEntity<?> logHabit(
+            @PathVariable Long id,
+            @RequestParam String date,
+            Authentication authentication
+    ) {
+        HabitLog log = habitService.trackHabit(
+                id,
+                LocalDate.parse(date),
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok(log);
+    }
+
+    @GetMapping("/{id}/logs")
+    public ResponseEntity<?> getLogsByMonth(
+            @PathVariable Long id,
+            @RequestParam int year,
+            @RequestParam int month,
+            Authentication authentication
+    ) {
+
+        List<HabitLog> logs =
+                habitService.getLogsForMonth(id, year, month, authentication.getName());
+
+        return ResponseEntity.ok(logs);
     }
 }

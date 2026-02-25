@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -28,6 +31,9 @@ public class Habit {
     @JsonIgnore
     private User user;
 
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<HabitLog> logs = new ArrayList<>();
 
     public Habit(String title, String description, String frequency, Boolean completed, User user) {
         this.title = title;
@@ -37,5 +43,4 @@ public class Habit {
         this.user = user;
     }
 
-    // Getters & Setters
 }
