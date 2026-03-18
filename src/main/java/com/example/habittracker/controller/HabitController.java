@@ -45,6 +45,20 @@ public class HabitController {
     }
 
 
+    @GetMapping("/{id}/logs")
+    public ResponseEntity<?> getLogsByMonth(
+            @PathVariable Long id,
+            @RequestParam int year,
+            @RequestParam int month,
+            Authentication authentication
+    ) {
+
+        List<HabitLog> logs =
+                habitService.getLogsForMonth(id, year, month, authentication.getName());
+
+        return ResponseEntity.ok(logs);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateHabit(
             @PathVariable Long id,
@@ -94,17 +108,13 @@ public class HabitController {
         return ResponseEntity.ok(log);
     }
 
-    @GetMapping("/{id}/logs")
-    public ResponseEntity<?> getLogsByMonth(
-            @PathVariable Long id,
-            @RequestParam int year,
-            @RequestParam int month,
-            Authentication authentication
+    @DeleteMapping("/{habitId}/log")
+    public ResponseEntity<?> deleteLog(
+            @PathVariable Long habitId,
+            @RequestParam String date
     ) {
-
-        List<HabitLog> logs =
-                habitService.getLogsForMonth(id, year, month, authentication.getName());
-
-        return ResponseEntity.ok(logs);
+        habitService.deleteLog(habitId, date);
+        return ResponseEntity.ok().build();
     }
+
 }
