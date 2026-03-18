@@ -19,6 +19,7 @@ public class HabitLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private LocalDate date;
 
     private Boolean completed;
