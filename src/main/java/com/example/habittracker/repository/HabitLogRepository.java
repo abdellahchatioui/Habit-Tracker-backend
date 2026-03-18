@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-
+@Repository
 public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
 
     Optional<HabitLog> findByHabitIdAndDate(Long habitId, LocalDate date);
@@ -18,4 +18,6 @@ public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
             LocalDate start,
             LocalDate end
     );
+
+    void deleteByHabitIdAndDate(Long habitId, LocalDate date);
 }
