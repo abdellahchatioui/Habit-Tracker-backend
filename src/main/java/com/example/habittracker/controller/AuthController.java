@@ -2,16 +2,13 @@ package com.example.habittracker.controller;
 
 import com.example.habittracker.Entity.User;
 import com.example.habittracker.dto.LoginRequest;
-import com.example.habittracker.repository.UserRepository;
-import com.example.habittracker.security.JwtUtil;
+import com.example.habittracker.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/auth")
@@ -19,54 +16,30 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    public UserRepository userRepository;
-
-    @GetMapping
-    public String test(){
-        return "server work !!!";
-    }
+    private AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401)
-                    .body(Map.of("error", "Invalid credentials"));
+        try {
+            String token = authService.login(request);
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("Invalid credentials") || e.getMessage().equals("User not found")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid credentials"));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An error occurred during login"));
         }
-
-        String token = jwtUtil.generateToken(user.getEmail());
-
-        return ResponseEntity.ok(Map.of("token", token));
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User newUser) {
-
-        Optional<User> existingUser = userRepository.findByEmail(newUser.getEmail());
-
-        if (existingUser.isPresent()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", "Email already exists"));
+        try {
+            authService.register(newUser);
+            return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        newUser.setRole("USER");
-        newUser.setEnabled(true);
-
-        userRepository.save(newUser);
-
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
-
-
 }
