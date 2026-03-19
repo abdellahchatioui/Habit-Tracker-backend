@@ -2,7 +2,10 @@ package com.example.habittracker.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,16 +21,24 @@ public class Habit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title cannot be empty")
+    @Size(max = 100, message = "Title cannot exceed 100 characters")
+    @Column(nullable = false)
     private String title;
 
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 
-    private String frequency; // DAILY, WEEKLY
+    @NotBlank(message = "Frequency is required")
+    @Pattern(regexp = "^(DAILY|WEEKLY)$", message = "Frequency must be either DAILY or WEEKLY")
+    @Column(nullable = false)
+    private String frequency;
 
+    @NotNull(message = "Completed status cannot be null")
     private Boolean completed;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
@@ -42,5 +53,4 @@ public class Habit {
         this.completed = completed;
         this.user = user;
     }
-
 }
