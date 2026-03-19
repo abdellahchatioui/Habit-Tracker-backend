@@ -2,6 +2,7 @@ package com.example.habittracker.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,14 +20,15 @@ public class HabitLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @NotNull(message = "Date cannot be null")
+    @Column(unique = true,nullable = false)
     private LocalDate date;
 
+    @NotNull(message = "Completed status cannot be null")
     private Boolean completed;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "habit_id", nullable = false)
     @JsonIgnore
     private Habit habit;
-
 }
