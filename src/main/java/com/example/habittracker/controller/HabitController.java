@@ -8,55 +8,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/habits")
 @CrossOrigin
+@Controller
 public class HabitController {
 
-    private final HabitRepository habitRepository;
-    private final UserRepository userRepository;
     private final HabitService habitService;
 
-    public HabitController(HabitRepository habitRepository, UserRepository userRepository, HabitService habitService) {
-        this.habitRepository = habitRepository;
-        this.userRepository = userRepository;
+    public HabitController(HabitService habitService) {
         this.habitService = habitService;
     }
 
 
     @GetMapping
-    public List<Habit> getHabits() {
-
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
-
-        // System.out.println("Email : "+ email);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return habitRepository.findByUser(user);
+    public ResponseEntity<?> getHabits() {
+        List<Habit> allHabits = habitService.getHabits();
+        return ResponseEntity.ok(allHabits);
     }
 
 
-    @GetMapping("/{id}/logs")
-    public ResponseEntity<?> getLogsByMonth(
-            @PathVariable Long id,
-            @RequestParam int year,
-            @RequestParam int month,
-            Authentication authentication
-    ) {
-
-        List<HabitLog> logs =
-                habitService.getLogsForMonth(id, year, month, authentication.getName());
-
-        return ResponseEntity.ok(logs);
+    @PostMapping()
+    public ResponseEntity<?> createHabit(@RequestBody Habit habit) {
+        Habit savedHabit = habitService.saveHabit(habit);
+        return ResponseEntity.ok(savedHabit);
     }
 
     @PutMapping("/{id}")
@@ -71,50 +53,12 @@ public class HabitController {
         return ResponseEntity.ok(habit);
     }
 
-    @PostMapping()
-    public Habit createHabit(@RequestBody Habit habit) {
-
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        habit.setUser(user);
-
-        return habitRepository.save(habit);
-    }
-
 
     @DeleteMapping("/{id}")
-    public void deleteHabit(@PathVariable Long id) {
-
-        habitRepository.deleteById(id);
-    }
-
-    @PostMapping("/{id}/log")
-    public ResponseEntity<?> logHabit(
-            @PathVariable Long id,
-            @RequestParam String date,
-            Authentication authentication
-    ) {
-        HabitLog log = habitService.trackHabit(
-                id,
-                LocalDate.parse(date),
-                authentication.getName()
-        );
-
-        return ResponseEntity.ok(log);
-    }
-
-    @DeleteMapping("/{habitId}/log")
-    public ResponseEntity<?> deleteLog(
-            @PathVariable Long habitId,
-            @RequestParam String date
-    ) {
-        habitService.deleteLog(habitId, date);
+    public ResponseEntity<?> deleteHabit(@PathVariable Long id) {
+        habitService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
 
 }
